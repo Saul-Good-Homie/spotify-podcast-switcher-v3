@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+const PODCASTS_ENDPOINT = "https://api.spotify.com/v1/me/episodes";
+const PLAYLISTS_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
+
 
 
 const track = {
@@ -28,7 +31,7 @@ function WebPlayback(props) {
 
     //functions to get podcasts and playlists
     const getPodcasts = () => {
-        axios.get('https://api.spotify.com/v1/me/episodes', {
+        axios.get(PODCASTS_ENDPOINT, {
             headers: {
                 Authorization: "Bearer " + props.token,
             }
@@ -41,7 +44,7 @@ function WebPlayback(props) {
     }
 
     const getPlaylists = () => {
-                axios.get('https://api.spotify.com/v1/me/playlists', {
+                axios.get(PLAYLISTS_ENDPOINT, {
                     headers: {
                         Authorization: "Bearer " + props.token,
                     }
@@ -98,15 +101,10 @@ function WebPlayback(props) {
 
         };
 
-            // getPodcasts()
+            getPodcasts()
             getPlaylists()
 
     }, []);
-
- 
-            console.log(playlists)
-
-
 
     if (!is_active) { 
         return (
@@ -142,7 +140,8 @@ function WebPlayback(props) {
                             </button>
                         </div>
                         <div className="podcasts">
-                                
+                        {podcasts.map((podcast) => <button className="btn-spotify" title={podcast.epsiode} key={podcast.episode.id}>{podcast.episode.name}</button>) }
+
                         </div>
                         <div className="playlists">
                                {playlists.map((playlist) => <button className="btn-spotify" title={playlist.name} key={playlist.id}>{playlist.name}</button>) }
