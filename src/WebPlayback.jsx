@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 
 const track = {
     name: "",
@@ -18,6 +20,38 @@ function WebPlayback(props) {
     const [is_active, setActive] = useState(false);
     const [player, setPlayer] = useState(undefined);
     const [current_track, setTrack] = useState(track);
+
+    const [podcasts, setPodcasts] = useState([]);
+    const [selectedPodcast, setSelectedPodcast] = useState(null);
+    const [playlists, setPlaylists] = useState([]);
+    const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+
+    //functions to get podcasts and playlists
+    const getPodcasts = () => {
+        axios.get('https://api.spotify.com/v1/me/episodes', {
+            headers: {
+                Authorization: "Bearer " + props.token,
+            }
+        }).then(response => {
+            setPodcasts(response.data.items); 
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
+    const getPlaylists = () => {
+                axios.get('https://api.spotify.com/v1/me/playlists', {
+                    headers: {
+                        Authorization: "Bearer " + props.token,
+                    }
+                }).then(response => {
+                    setPlaylists(response.data.items);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
 
     useEffect(() => {
 
@@ -63,7 +97,16 @@ function WebPlayback(props) {
             player.connect();
 
         };
+
+            // getPodcasts()
+            getPlaylists()
+
     }, []);
+
+ 
+            console.log(playlists)
+
+
 
     if (!is_active) { 
         return (
@@ -98,6 +141,13 @@ function WebPlayback(props) {
                                 &gt;&gt;
                             </button>
                         </div>
+                        <div className="podcasts">
+                                
+                        </div>
+                        <div className="playlists">
+                               {playlists.map((playlist) => <button className="btn-spotify" title={playlist.name} key={playlist.id}>{playlist.name}</button>) }
+                        </div>
+
                     </div>
                 </div>
             </>
