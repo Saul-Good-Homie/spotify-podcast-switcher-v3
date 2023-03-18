@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 const PODCASTS_ENDPOINT = "https://api.spotify.com/v1/me/episodes";
 const PLAYLISTS_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
+const PLAY_ENDPOINT = "https://api.spotify.com/v1/me/player/play"
 
 
 
@@ -56,6 +57,34 @@ function WebPlayback(props) {
                 });
             }
 
+        //function to play the sdk connect with a specific uri
+    const handlePlaylistClick = (id) => {
+        axios.put(PLAY_ENDPOINT, {
+          context_uri: `spotify:playlist:${id}`
+        }, {
+          headers: {
+            Authorization: "Bearer " + props.token,
+            "Content-Type": "application/json"
+          }
+        }).then(response => {   
+          console.log("started playing")
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
+
+
+
+        // const handlePlaylistClick = (playlist_id) => {
+        //     if (player) {
+        //       player.play({
+        //         context_uri: `spotify:playlist:${playlist_id}`
+        //       });
+        //     }
+        //   };
+
+
     useEffect(() => {
 
         const script = document.createElement("script");
@@ -103,6 +132,7 @@ function WebPlayback(props) {
 
             getPodcasts()
             getPlaylists()
+            console.log(playlists)
 
     }, []);
 
@@ -144,7 +174,35 @@ function WebPlayback(props) {
 
                         </div>
                         <div className="playlists">
-                               {playlists.map((playlist) => <button className="btn-spotify" title={playlist.name} key={playlist.id}>{playlist.name}</button>) }
+                               {playlists.map((playlist) => 
+                               
+                               //<button className="btn-spotify" title={playlist.name} key={playlist.id}>{playlist.name}</button>
+                               <button
+                                    className="btn-spotify"
+                                    title={playlist.name}
+                                    key={playlist.id}
+                                    onClick={() => handlePlaylistClick(playlist.id)}
+                                    // onClick={() => {
+                                    //     player.pause();
+                                    //     player
+                                    //     .setVolume(0.5)
+                                    //     .then(() => {
+                                    //         return player.play({
+                                    //         spotify_uri: playlist.uri,
+                                    //         offset: { position: 0 },
+                                    //         });
+                                    //     })
+                                    //     .then(() => {
+                                    //         setSelectedPlaylist(playlist.id);
+                                    //     });
+                                    // }}
+                                    style={{ fontWeight: selectedPlaylist === playlist.id ? "bold" : "normal" }}
+                                    >
+                                    {playlist.name}
+                                    </button>
+
+
+                               )}
                         </div>
 
                     </div>
