@@ -30,7 +30,7 @@ function WebPlayback(props) {
         window.onSpotifyWebPlaybackSDKReady = () => {
 
             const player = new window.Spotify.Player({
-                name: 'Web Playback SDK',
+                name: 'Podcast-Switcher-V3',
                 getOAuthToken: cb => { cb(props.token); },
                 volume: 0.5
             });
