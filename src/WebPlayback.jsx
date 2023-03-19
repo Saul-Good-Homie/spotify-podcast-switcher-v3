@@ -59,22 +59,56 @@ function WebPlayback(props) {
             }
 
     //functions to play the sdk connect with a specific uri
-    const handlePlaylistClick = (id) => {
-        axios.put(PLAY_ENDPOINT, {
-          context_uri: `spotify:playlist:${id}`
-        }, {
+    // const handlePlaylistClick = (id) => {
+    //     axios.put(PLAY_ENDPOINT, {
+    //       context_uri: `spotify:playlist:${id}`
+    //     }, {
+    //       headers: {
+    //         Authorization: "Bearer " + props.token,
+    //         "Content-Type": "application/json"
+    //       }
+    //     }).then(response => {   
+    //       console.log("started playing")
+    //       setSelectedPlaylist(id)
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    //   }
+
+      //version two of handle playlists
+      const handlePlaylistClick = (id) => {
+        axios.get(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
           headers: {
-            Authorization: "Bearer " + props.token,
-            "Content-Type": "application/json"
+            Authorization: "Bearer " + props.token
           }
-        }).then(response => {   
-          console.log("started playing")
-          setSelectedPlaylist(id)
+        }).then(response => {
+          const tracks = response.data.items;
+          
+          const randomTrackIndex = Math.floor(Math.random() * tracks.length);
+          const randomTrackUri = tracks[randomTrackIndex].track.uri;
+          console.log(randomTrackUri)
+
+          axios.put(PLAY_ENDPOINT, {
+            uris: [randomTrackUri]
+          }, {
+            headers: {
+              Authorization: "Bearer " + props.token,
+              "Content-Type": "application/json"
+            }
+          }).then(response => {   
+            console.log("started playing")
+            setSelectedPlaylist(id)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         })
         .catch((error) => {
           console.log(error);
         });
       }
+      
 
       const handlePodcastClick = (id) => {
         axios.put(PLAY_ENDPOINT, {
@@ -112,6 +146,22 @@ function WebPlayback(props) {
         });
       }
 
+      const transferPlayback = (id) => {
+        axios.put(CURRENT_PLAYBACK, {
+            device_ids: [id]
+          }, {
+            headers: {
+              Authorization: "Bearer " + props.token,
+              "Content-Type": "application/json"
+            }
+          }).then(response => {   
+            console.log("transferred playback to active SDK")
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
     useEffect(() => {
 
         const script = document.createElement("script");
@@ -128,10 +178,14 @@ function WebPlayback(props) {
                 volume: 0.5
             });
 
+            
             setPlayer(player);
+            
+            
 
             player.addListener('ready', ({ device_id }) => {
                 console.log('Ready with Device ID', device_id);
+                transferPlayback(device_id);
             });
 
             player.addListener('not_ready', ({ device_id }) => {
@@ -139,11 +193,9 @@ function WebPlayback(props) {
             });
 
             player.addListener('player_state_changed', ( state => {
-
                 if (!state) {
                     return;
                 }
-
                 setTrack(state.track_window.current_track);
                 setPaused(state.paused);
 
@@ -154,9 +206,10 @@ function WebPlayback(props) {
             }));
 
             player.connect();
-
+            
+           
         };
-
+            
             getPodcasts()
             getPlaylists()
 
