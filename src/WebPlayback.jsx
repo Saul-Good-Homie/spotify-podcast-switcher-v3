@@ -3,6 +3,7 @@ import axios from 'axios';
 const PODCASTS_ENDPOINT = "https://api.spotify.com/v1/me/episodes";
 const PLAYLISTS_ENDPOINT = "https://api.spotify.com/v1/me/playlists";
 const PLAY_ENDPOINT = "https://api.spotify.com/v1/me/player/play"
+const CURRENT_PLAYBACK = "https://api.spotify.com/v1/me/player"
 
 
 
@@ -57,7 +58,7 @@ function WebPlayback(props) {
                 });
             }
 
-        //function to play the sdk connect with a specific uri
+    //functions to play the sdk connect with a specific uri
     const handlePlaylistClick = (id) => {
         axios.put(PLAY_ENDPOINT, {
           context_uri: `spotify:playlist:${id}`
@@ -68,22 +69,48 @@ function WebPlayback(props) {
           }
         }).then(response => {   
           console.log("started playing")
+          setSelectedPlaylist(id)
         })
         .catch((error) => {
           console.log(error);
         });
       }
 
+      const handlePodcastClick = (id) => {
+        axios.put(PLAY_ENDPOINT, {
+          uris: [`spotify:episode:${id}`]
+        }, {
+          headers: {
+            Authorization: "Bearer " + props.token,
+            "Content-Type": "application/json"
+          }
+        }).then(response => {   
+          console.log("started playing")
+          setSelectedPodcast(id)
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
 
-
-        // const handlePlaylistClick = (playlist_id) => {
-        //     if (player) {
-        //       player.play({
-        //         context_uri: `spotify:playlist:${playlist_id}`
-        //       });
-        //     }
-        //   };
-
+      const togglePlayback = () => {
+        axios.get(CURRENT_PLAYBACK, {
+          headers: {
+            Authorization: "Bearer " + props.token,
+          },
+        })
+        .then(response => {
+            if(response.data.currently_playing_type === "track"){
+                handlePodcastClick(selectedPodcast)
+            }
+            if(response.data.currently_playing_type === "episode"){
+                handlePlaylistClick(selectedPlaylist)
+            }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
 
     useEffect(() => {
 
@@ -132,7 +159,6 @@ function WebPlayback(props) {
 
             getPodcasts()
             getPlaylists()
-            console.log(playlists)
 
     }, []);
 
@@ -168,9 +194,32 @@ function WebPlayback(props) {
                             <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
                                 &gt;&gt;
                             </button>
+                            <button className="btn-spotify" onClick={() => {togglePlayback()}}>
+                                Toggle Playback
+                            </button>
+
                         </div>
                         <div className="podcasts">
-                        {podcasts.map((podcast) => <button className="btn-spotify" title={podcast.epsiode} key={podcast.episode.id}>{podcast.episode.name}</button>) }
+                        {podcasts.map((podcast) => <button className="btn-spotify" title={podcast.epsiode} key={podcast.episode.id}
+                            onClick={() => handlePodcastClick(podcast.episode.id)}
+                            // onClick={() => {
+                            //     player.pause();
+                            //     player
+                            //     .setVolume(0.5)
+                            //     .then(() => {
+                            //         return player.play({
+                            //         spotify_uri: playlist.uri,
+                            //         offset: { position: 0 },
+                            //         });
+                            //     })
+                            //     .then(() => {
+                            //         setSelectedPlaylist(playlist.id);
+                            //     });
+                            // }}
+                            style={{ fontWeight: selectedPodcast === podcast.episode.id ? "bold" : "normal" }}
+                            >
+                            
+                            {podcast.episode.name}</button>) }
 
                         </div>
                         <div className="playlists">
@@ -200,8 +249,6 @@ function WebPlayback(props) {
                                     >
                                     {playlist.name}
                                     </button>
-
-
                                )}
                         </div>
 
