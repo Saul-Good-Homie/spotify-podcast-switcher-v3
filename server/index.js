@@ -14,7 +14,7 @@ dotenv.config()
 // var spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET
 // var spotify_redirect_uri = 'http://localhost:3000/auth/callback'
 
-const port = process.env.PORT || 8888;
+const port = parseInt(process.env.PORT, 10) || 8888;
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const spotify_redirect_uri = process.env.SPOTIFY_REDIRECT_URI || 'http://localhost:3000/auth/callback';
