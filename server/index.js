@@ -3,8 +3,6 @@ const request = require('request');
 const dotenv = require('dotenv');
 const path = require('path');
 
-
-
 global.access_token = ''
 
 dotenv.config()
@@ -30,7 +28,6 @@ var generateRandomString = function (length) {
 };
 
 var app = express();
-
 
 app.get('/auth/login', (req, res) => {
 

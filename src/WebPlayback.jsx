@@ -78,17 +78,17 @@ function WebPlayback(props) {
 
       //version two of handle playlists
       const handlePlaylistClick = (id) => {
+        //get all the tracks in the selected playlist
         axios.get(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
           headers: {
             Authorization: "Bearer " + props.token
           }
         }).then(response => {
-          const tracks = response.data.items;
-          
+         //choose a track at random
+          const tracks = response.data.items;  
           const randomTrackIndex = Math.floor(Math.random() * tracks.length);
           const randomTrackUri = tracks[randomTrackIndex].track.uri;
-          console.log(randomTrackUri)
-
+          //play that track via put call to me/player/play
           axios.put(PLAY_ENDPOINT, {
             uris: [randomTrackUri]
           }, {
