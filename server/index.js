@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 
 const port = 8888
 
+
 global.access_token = ''
 
 dotenv.config()
@@ -24,6 +25,7 @@ var generateRandomString = function (length) {
 };
 
 var app = express();
+
 
 app.get('/auth/login', (req, res) => {
 
@@ -75,3 +77,5 @@ app.get('/auth/token', (req, res) => {
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
 })
+
+app.use(express.static(path.join(__dirname, '../build')));
