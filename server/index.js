@@ -72,6 +72,12 @@ app.get('/auth/callback', (req, res) => {
 
 })
 
+app.use(express.static(path.join(__dirname, '../build')));
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+}); 
+
 app.get('/auth/token', (req, res) => {
   res.json({ access_token: access_token})
 })
@@ -80,4 +86,3 @@ app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
 })
 
-// app.use(express.static(path.join(__dirname, '../build')));
